@@ -186,7 +186,28 @@ def main():
                 gr.Image(str(ROOT/'outputs'/'training_curves.png'), label='Training & Validation Accuracy Across Epochs')
                 gr.Image(str(ROOT/'outputs'/'confusion_matrix.png'), label='CNN Confusion Matrix (Clean Held-out Test Set)')
         with gr.Tab('About this project'):
-            gr.Markdown('**Question:** Does a compact CNN remain more robust than a flattened-image MLP with limited training data?\n\nThe UCI Devanagari Handwritten Character Dataset (CC BY 4.0) supplies 46 classes of 32×32 grayscale images. The CNN retains spatial structure through convolution and pooling; the MLP uses 1,024 flattened pixels. Scores are softmax model scores, not calibrated probabilities.')
+            gr.Markdown("""### About AksharCoach
+**CSM422 Deep Learning Course Project**
+
+#### 1. Core Research Question
+*Does a compact CNN maintain higher robustness and spatial generalization than a flattened-image MLP baseline under limited training data (100 samples/class) and controlled image distortions?*
+
+#### 2. Dataset & Benchmark
+* **Dataset:** UCI Devanagari Handwritten Character Dataset (CC BY 4.0, Patel et al.).
+* **Classes:** 46 total (36 consonants क–ज्ञ and 10 digits ०–९).
+* **Evaluation Partition:** 15% official held-out test split (13,800 images).
+
+#### 3. Model Architecture Comparison
+* **Compact CNN (Proposed - 91.80% Test Acc):** `[1, 32, 32] -> Conv2D(32, 3x3) -> MaxPool(2x2) [32, 16, 16] -> Conv2D(64, 3x3) -> MaxPool(2x2) [64, 8, 8] -> Flatten(4096) -> Linear(128) + ReLU + Dropout -> Linear(46 logits)`. Preserves 2D stroke geometry and spatial translation invariance.
+* **MLP Baseline (75.14% Test Acc):** `[1, 32, 32] -> Flatten(1024) -> Linear(128) + ReLU + Dropout -> Linear(46 logits)`. Destroys 2D pixel adjacency by treating each pixel as an independent feature.
+
+#### 4. Scope & Responsible Boundary
+* **Supported Scope:** Single isolated Devanagari consonants (क–ज्ञ) and digits (०–९) on plain background or separated sheets.
+* **Limitations:** Not full-word or sentence OCR; does not segment connected Shirorekha or Hindi vowels (स्वर), which were outside the UCI benchmark scope.
+* **Softmax Scores:** Scores are model outputs, not calibrated real-world probabilities. Low-confidence predictions (<20%) are safely rejected as *Uncertain*.
+
+**Documentation:** [GitHub Repository](https://github.com/Vibhor-choudhary/Deep-Learning-Project-1) | [Technical Report](https://github.com/Vibhor-choudhary/Deep-Learning-Project-1/blob/main/AksharCoach/REPORT.md) | [Viva Defense Guide](https://github.com/Vibhor-choudhary/Deep-Learning-Project-1/blob/main/AksharCoach/VIVA_QUESTIONS.md)
+""")
     # Loopback only; choose a different local port with AKSHARCOACH_PORT if needed.
     app.launch(server_name='127.0.0.1', server_port=int(os.getenv('AKSHARCOACH_PORT', '7860')), share=False)
 if __name__=='__main__': main()

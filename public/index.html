@@ -1020,20 +1020,108 @@
 
   <!-- TAB 4: ABOUT THIS PROJECT -->
   <div id="aboutTab" class="gr-tab-content">
-    <h3 class="gr-section-title">About AksharCoach</h3>
-    <p style="font-size: 14.5px; line-height: 1.7; color: #374151; margin-bottom: 16px;">
-      <strong>Question:</strong> Does a compact CNN remain more robust than a flattened-image MLP with limited training data?
-    </p>
-    <p style="font-size: 14px; line-height: 1.7; color: #4b5563; margin-bottom: 16px;">
-      The UCI Devanagari Handwritten Character Dataset (CC BY 4.0) supplies 46 classes of 32×32 grayscale images. The CNN retains spatial structure through convolution and pooling; the MLP uses 1,024 flattened pixels. Scores are softmax model scores, not calibrated probabilities.
-    </p>
-    <p style="font-size: 14px; line-height: 1.7; color: #4b5563; margin-bottom: 24px;">
-      Source code, full technical report, viva defense guide, and training pipelines are open source on GitHub:
-      <br />
-      <a href="https://github.com/Vibhor-choudhary/Deep-Learning-Project-1" target="_blank" rel="noopener noreferrer" style="color: #ff7c00; font-weight: 600; text-decoration: underline;">
-        https://github.com/Vibhor-choudhary/Deep-Learning-Project-1
+    <div style="margin-bottom: 24px;">
+      <h3 class="gr-section-title" style="font-size: 18px;">About AksharCoach</h3>
+      <p class="gr-section-desc" style="font-size: 14px; margin-bottom: 20px;">
+        AksharCoach is an educational deep learning research project for <strong>CSM422 Deep Learning</strong>. It investigates isolated Devanagari handwriting recognition under limited training data budgets and evaluates spatial feature learning against pixel-flattened baselines.
+      </p>
+    </div>
+
+    <!-- 3 KEY HIGHLIGHT PILLARS -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 28px;">
+      <div style="border: 1px solid var(--gr-border); border-radius: var(--radius); padding: 16px; background: #fafafa;">
+        <div style="font-size: 11px; font-weight: 700; color: #ff7c00; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Core Research Question</div>
+        <div style="font-size: 13.5px; font-weight: 600; color: #111827; margin-bottom: 6px;">Does a Compact CNN outperform a Flattened MLP under limited data?</div>
+        <p style="font-size: 12.5px; color: #4b5563; line-height: 1.5;">
+          With a constrained training budget of 100 images per class, we measure how effectively 2D convolution filters learn invariant stroke representations compared to a fully-connected MLP.
+        </p>
+      </div>
+
+      <div style="border: 1px solid var(--gr-border); border-radius: var(--radius); padding: 16px; background: #fafafa;">
+        <div style="font-size: 11px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Dataset Benchmark</div>
+        <div style="font-size: 13.5px; font-weight: 600; color: #111827; margin-bottom: 6px;">UCI Devanagari Handwritten Character Dataset</div>
+        <p style="font-size: 12.5px; color: #4b5563; line-height: 1.5;">
+          46 classes total: <strong>36 Consonants (क to ज्ञ)</strong> and <strong>10 Digits (० to ९)</strong>. Evaluated on the publisher-reserved 15% Test partition (13,800 unseen test images).
+        </p>
+      </div>
+
+      <div style="border: 1px solid var(--gr-border); border-radius: var(--radius); padding: 16px; background: #fafafa;">
+        <div style="font-size: 11px; font-weight: 700; color: #059669; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Confidence-Aware Decision</div>
+        <div style="font-size: 13.5px; font-weight: 600; color: #111827; margin-bottom: 6px;">Validation-Selected Thresholding (20%)</div>
+        <p style="font-size: 12.5px; color: #4b5563; line-height: 1.5;">
+          Rather than returning reckless guesses, predictions below the validation threshold are flagged as <em>Uncertain</em> to safely reject out-of-distribution or noisy strokes.
+        </p>
+      </div>
+    </div>
+
+    <!-- ARCHITECTURE COMPARISON -->
+    <h3 class="gr-section-title" style="margin-bottom: 12px;">Model Architectures Compared</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px;">
+      <!-- CNN CARD -->
+      <div style="border: 1px solid var(--gr-border); border-radius: var(--radius); padding: 18px; background: #ffffff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h4 style="font-size: 15px; font-weight: 700; color: #0f172a;">Compact CNN (Proposed Model)</h4>
+          <span style="background: #ecfdf5; color: #065f46; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #a7f3d0;">91.80% Test Acc</span>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 11.5px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 12px; line-height: 1.6; color: #334155;">
+          Input: [1, 32, 32] Grayscale<br />
+          &rarr; Conv2D(1&rarr;32, k=3, pad=1) + ReLU<br />
+          &rarr; MaxPool2D(2&times;2) &rarr; [32, 16, 16]<br />
+          &rarr; Conv2D(32&rarr;64, k=3, pad=1) + ReLU<br />
+          &rarr; MaxPool2D(2&times;2) &rarr; [64, 8, 8]<br />
+          &rarr; Flatten &rarr; 4,096 features<br />
+          &rarr; Linear(4096&rarr;128) + ReLU + Dropout(0.25)<br />
+          &rarr; Linear(128&rarr;46 logits)
+        </div>
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.5;">
+          <strong>Why it works:</strong> Small 3&times;3 convolution filters scan local stroke curves, loops, and intersections while pooling creates spatial translation invariance.
+        </p>
+      </div>
+
+      <!-- MLP CARD -->
+      <div style="border: 1px solid var(--gr-border); border-radius: var(--radius); padding: 18px; background: #ffffff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h4 style="font-size: 15px; font-weight: 700; color: #0f172a;">Multilayer Perceptron (Baseline)</h4>
+          <span style="background: #f1f5f9; color: #475569; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">75.14% Test Acc</span>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 11.5px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; margin-bottom: 12px; line-height: 1.6; color: #334155;">
+          Input: [1, 32, 32] Grayscale<br />
+          &rarr; Flatten &rarr; 1,024 values<br />
+          &rarr; Linear(1024&rarr;128) + ReLU<br />
+          &rarr; Dropout(0.25)<br />
+          &rarr; Linear(128&rarr;46 logits)<br />
+          <br />
+          <span style="color: #94a3b8;">(Lacks spatial 2D convolutions)</span>
+        </div>
+        <p style="font-size: 12.5px; color: #475569; line-height: 1.5;">
+          <strong>Why it struggles:</strong> Flattening the 2D matrix into a 1D vector treats every pixel independently, destroying horizontal and vertical stroke adjacency.
+        </p>
+      </div>
+    </div>
+
+    <!-- SCOPE & VIVA SUMMARY -->
+    <div style="border: 1px solid #fed7aa; background: #fffaf0; border-radius: var(--radius); padding: 18px; margin-bottom: 24px;">
+      <h4 style="font-size: 14px; font-weight: 700; color: #9a3412; margin-bottom: 8px;">Scope, Limitations & Responsible Use</h4>
+      <ul style="font-size: 13px; color: #7c2d12; line-height: 1.65; padding-left: 20px;">
+        <li><strong>Isolated Character Scope:</strong> AksharCoach classifies isolated characters. It includes an automatic morphological line-stripper for spaced sheets and charts, but does not read continuous words, sentences, or paragraphs joined by a Shirorekha.</li>
+        <li><strong>Dataset Boundaries:</strong> Trained exclusively on the 46 UCI classes (36 consonants क–ज्ञ and 10 digits ०–९). Hindi vowels (स्वर: अ, आ, इ...) and conjuncts outside the 46 classes are out-of-distribution and flagged as Uncertain.</li>
+        <li><strong>Model Scores vs Probabilities:</strong> Softmax outputs are uncalibrated model scores, not guaranteed real-world probabilities.</li>
+      </ul>
+    </div>
+
+    <!-- PROJECT LINKS -->
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <a href="https://github.com/Vibhor-choudhary/Deep-Learning-Project-1" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #111827; color: #ffffff; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub Repository & Source Code
       </a>
-    </p>
+      <a href="https://github.com/Vibhor-choudhary/Deep-Learning-Project-1/blob/main/AksharCoach/REPORT.md" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #ffffff; color: #111827; border: 1px solid var(--gr-border); border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;">
+        Full Technical Report (REPORT.md)
+      </a>
+      <a href="https://github.com/Vibhor-choudhary/Deep-Learning-Project-1/blob/main/AksharCoach/VIVA_QUESTIONS.md" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #ffffff; color: #111827; border: 1px solid var(--gr-border); border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none;">
+        Viva Defense Guide (VIVA_QUESTIONS.md)
+      </a>
+    </div>
   </div>
 
   <!-- GRADIO FOOTER -->
