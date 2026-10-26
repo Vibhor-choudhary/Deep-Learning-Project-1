@@ -1,0 +1,46 @@
+{
+  "dataset": {
+    "test_images": 13800,
+    "classes": 46
+  },
+  "models": {
+    "mlp": {
+      "threshold": 0.49999999999999994,
+      "clean": {
+        "accuracy": 0.7514492753623189,
+        "macro_precision": 0.7581591448893698,
+        "macro_recall": 0.7514492753623188,
+        "macro_f1": 0.7490276967320099,
+        "accepted_percentage": 0.6763768115942029,
+        "accepted_accuracy": 0.8977930147846582
+      },
+      "distorted": {
+        "accuracy": 0.6694202898550725,
+        "macro_precision": 0.6763786682217894,
+        "macro_recall": 0.6694202898550725,
+        "macro_f1": 0.6662369037446819,
+        "accepted_percentage": 0.5872463768115942,
+        "accepted_accuracy": 0.8620434353405726
+      }
+    },
+    "cnn": {
+      "threshold": 0.2,
+      "clean": {
+        "accuracy": 0.9179710144927536,
+        "macro_precision": 0.9199185321848738,
+        "macro_recall": 0.9179710144927533,
+        "macro_f1": 0.9179956906676346,
+        "accepted_percentage": 0.9990579710144928,
+        "accepted_accuracy": 0.9187640530934938
+      },
+      "distorted": {
+        "accuracy": 0.8707246376811594,
+        "macro_precision": 0.8742695455843252,
+        "macro_recall": 0.8707246376811593,
+        "macro_f1": 0.8708024487613877,
+        "accepted_percentage": 0.9972463768115942,
+        "accepted_accuracy": 0.8726929225403285
+      }
+    }
+  }
+}

@@ -1,0 +1,232 @@
+[
+  {
+    "index": 0,
+    "folder": "character_10_yna",
+    "glyph": "ञ"
+  },
+  {
+    "index": 1,
+    "folder": "character_11_taamatar",
+    "glyph": "ट"
+  },
+  {
+    "index": 2,
+    "folder": "character_12_thaa",
+    "glyph": "ठ"
+  },
+  {
+    "index": 3,
+    "folder": "character_13_daa",
+    "glyph": "ड"
+  },
+  {
+    "index": 4,
+    "folder": "character_14_dhaa",
+    "glyph": "ढ"
+  },
+  {
+    "index": 5,
+    "folder": "character_15_adna",
+    "glyph": "ण"
+  },
+  {
+    "index": 6,
+    "folder": "character_16_tabala",
+    "glyph": "त"
+  },
+  {
+    "index": 7,
+    "folder": "character_17_tha",
+    "glyph": "थ"
+  },
+  {
+    "index": 8,
+    "folder": "character_18_da",
+    "glyph": "द"
+  },
+  {
+    "index": 9,
+    "folder": "character_19_dha",
+    "glyph": "ध"
+  },
+  {
+    "index": 10,
+    "folder": "character_1_ka",
+    "glyph": "क"
+  },
+  {
+    "index": 11,
+    "folder": "character_20_na",
+    "glyph": "न"
+  },
+  {
+    "index": 12,
+    "folder": "character_21_pa",
+    "glyph": "प"
+  },
+  {
+    "index": 13,
+    "folder": "character_22_pha",
+    "glyph": "फ"
+  },
+  {
+    "index": 14,
+    "folder": "character_23_ba",
+    "glyph": "ब"
+  },
+  {
+    "index": 15,
+    "folder": "character_24_bha",
+    "glyph": "भ"
+  },
+  {
+    "index": 16,
+    "folder": "character_25_ma",
+    "glyph": "म"
+  },
+  {
+    "index": 17,
+    "folder": "character_26_yaw",
+    "glyph": "य"
+  },
+  {
+    "index": 18,
+    "folder": "character_27_ra",
+    "glyph": "र"
+  },
+  {
+    "index": 19,
+    "folder": "character_28_la",
+    "glyph": "ल"
+  },
+  {
+    "index": 20,
+    "folder": "character_29_waw",
+    "glyph": "व"
+  },
+  {
+    "index": 21,
+    "folder": "character_2_kha",
+    "glyph": "ख"
+  },
+  {
+    "index": 22,
+    "folder": "character_30_motosaw",
+    "glyph": "श"
+  },
+  {
+    "index": 23,
+    "folder": "character_31_petchiryakha",
+    "glyph": "ष"
+  },
+  {
+    "index": 24,
+    "folder": "character_32_patalosaw",
+    "glyph": "स"
+  },
+  {
+    "index": 25,
+    "folder": "character_33_ha",
+    "glyph": "ह"
+  },
+  {
+    "index": 26,
+    "folder": "character_34_chhya",
+    "glyph": "क्ष"
+  },
+  {
+    "index": 27,
+    "folder": "character_35_tra",
+    "glyph": "त्र"
+  },
+  {
+    "index": 28,
+    "folder": "character_36_gya",
+    "glyph": "ज्ञ"
+  },
+  {
+    "index": 29,
+    "folder": "character_3_ga",
+    "glyph": "ग"
+  },
+  {
+    "index": 30,
+    "folder": "character_4_gha",
+    "glyph": "घ"
+  },
+  {
+    "index": 31,
+    "folder": "character_5_kna",
+    "glyph": "ङ"
+  },
+  {
+    "index": 32,
+    "folder": "character_6_cha",
+    "glyph": "च"
+  },
+  {
+    "index": 33,
+    "folder": "character_7_chha",
+    "glyph": "छ"
+  },
+  {
+    "index": 34,
+    "folder": "character_8_ja",
+    "glyph": "ज"
+  },
+  {
+    "index": 35,
+    "folder": "character_9_jha",
+    "glyph": "झ"
+  },
+  {
+    "index": 36,
+    "folder": "digit_0",
+    "glyph": "०"
+  },
+  {
+    "index": 37,
+    "folder": "digit_1",
+    "glyph": "१"
+  },
+  {
+    "index": 38,
+    "folder": "digit_2",
+    "glyph": "२"
+  },
+  {
+    "index": 39,
+    "folder": "digit_3",
+    "glyph": "३"
+  },
+  {
+    "index": 40,
+    "folder": "digit_4",
+    "glyph": "४"
+  },
+  {
+    "index": 41,
+    "folder": "digit_5",
+    "glyph": "५"
+  },
+  {
+    "index": 42,
+    "folder": "digit_6",
+    "glyph": "६"
+  },
+  {
+    "index": 43,
+    "folder": "digit_7",
+    "glyph": "७"
+  },
+  {
+    "index": 44,
+    "folder": "digit_8",
+    "glyph": "८"
+  },
+  {
+    "index": 45,
+    "folder": "digit_9",
+    "glyph": "९"
+  }
+]
