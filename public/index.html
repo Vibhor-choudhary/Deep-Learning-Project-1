@@ -782,11 +782,23 @@
     <div class="gr-examples">
       <div class="gr-examples-label">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Try this bundled 12-character handwritten batch
+        Try these bundled test batches (1-click held-out demonstration)
       </div>
       <div class="gr-example-thumbs">
-        <div class="gr-example-thumb batch-demo" title="12-character held-out batch" onclick="loadBatchPreset()">
-          <img src="/batch_demo.png" alt="12-character sample batch" />
+        <div class="gr-example-thumb batch-demo" title="10 Devanagari Digits (०, १, २, ३, ४, ५, ६, ७, ८, ९)" onclick="loadBatchFromUrl('/demos/demo_digits_0_to_9.png')">
+          <img src="/demos/demo_digits_0_to_9.png" alt="10 Digits (०-९)" />
+        </div>
+        <div class="gr-example-thumb batch-demo" title="12 Consonants (क, ख, ग, घ, ङ, च, छ, ज, झ, ञ, ट, ठ)" onclick="loadBatchFromUrl('/demos/demo_consonants_ka_to_ttha.png')">
+          <img src="/demos/demo_consonants_ka_to_ttha.png" alt="12 Consonants (क-ठ)" />
+        </div>
+        <div class="gr-example-thumb batch-demo" title="Complex Conjuncts (प, म, य, र, ल, व, श, स, ह, क्ष, त्र, ज्ञ)" onclick="loadBatchFromUrl('/demos/demo_complex_and_conjuncts.png')">
+          <img src="/demos/demo_complex_and_conjuncts.png" alt="Complex Conjuncts" />
+        </div>
+        <div class="gr-example-thumb batch-demo" title="Mixed Letters & Numbers (क, ग, प, म, र, स, १, २, ५, ७, ८, ९)" onclick="loadBatchFromUrl('/demos/demo_mixed_handwriting.png')">
+          <img src="/demos/demo_mixed_handwriting.png" alt="Mixed Handwriting" />
+        </div>
+        <div class="gr-example-thumb batch-demo" title="Original 12-character batch" onclick="loadBatchFromUrl('/batch_demo.png')">
+          <img src="/batch_demo.png" alt="Original Batch" />
         </div>
       </div>
     </div>

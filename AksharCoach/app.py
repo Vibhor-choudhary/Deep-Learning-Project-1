@@ -166,7 +166,14 @@ def main():
             with gr.Row(): page=gr.Image(type='pil',label='Multi-character handwriting page'); annotated=gr.Image(type='pil',label='Detected characters and decisions')
             page_status=gr.Textbox(label='Batch-analysis result'); page_table=gr.Dataframe(headers=['#','Glyph','Dataset class','Model score (%)','Decision'],label='Every detected character')
             gr.Button('Analyse all detected handwritten characters', variant='primary').click(analyze_page,page,[annotated,page_status,page_table])
-            gr.Examples(examples=[batch_example],inputs=page,label='Try this bundled 12-character handwritten batch')
+            batch_demos = [
+                str(ROOT/'outputs'/'demos'/'demo_digits_0_to_9.png'),
+                str(ROOT/'outputs'/'demos'/'demo_consonants_ka_to_ttha.png'),
+                str(ROOT/'outputs'/'demos'/'demo_complex_and_conjuncts.png'),
+                str(ROOT/'outputs'/'demos'/'demo_mixed_handwriting.png'),
+                batch_example
+            ]
+            gr.Examples(examples=batch_demos, inputs=page, label='Try these bundled test batches (Digits, Consonants, Conjuncts, Mixed)')
         with gr.Tab('Recognize one character only'):
             gr.Markdown('### Single-character mode\nUpload one tightly cropped handwritten character. If the upload contains many characters, the app will stop and direct you to batch mode instead of returning a misleading answer.')
             with gr.Row(): image=gr.Image(type='pil',label='Upload one PNG/JPG character'); processed=gr.Image(type='pil',label='Input image')
