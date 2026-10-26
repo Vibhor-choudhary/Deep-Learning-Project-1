@@ -1,0 +1,4 @@
+# The Gradio/PyTorch app is a local runtime, not a Vercel Function.
+# Vercel deploys the project showcase from public/ instead.
+AksharCoach/
+AGENTS.md
