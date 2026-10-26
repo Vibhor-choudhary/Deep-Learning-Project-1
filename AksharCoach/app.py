@@ -181,7 +181,10 @@ def main():
             gr.Button('Recognize').click(predict,image,[processed,status,table])
             gr.Examples(examples=examples, inputs=image, label='Bundled held-out examples')
         with gr.Tab('Model evaluation'):
-            gr.JSON(metrics,label='Actual held-out metrics'); gr.Dataframe(robustness,label='Clean vs distorted evaluation'); gr.Image(str(ROOT/'outputs'/'training_curves.png')); gr.Image(str(ROOT/'outputs'/'confusion_matrix.png'))
+            gr.Dataframe(robustness, label='Clean vs distorted evaluation (Held-Out Test Set: 13,800 images)')
+            with gr.Row():
+                gr.Image(str(ROOT/'outputs'/'training_curves.png'), label='Training & Validation Accuracy Across Epochs')
+                gr.Image(str(ROOT/'outputs'/'confusion_matrix.png'), label='CNN Confusion Matrix (Clean Held-out Test Set)')
         with gr.Tab('About this project'):
             gr.Markdown('**Question:** Does a compact CNN remain more robust than a flattened-image MLP with limited training data?\n\nThe UCI Devanagari Handwritten Character Dataset (CC BY 4.0) supplies 46 classes of 32×32 grayscale images. The CNN retains spatial structure through convolution and pooling; the MLP uses 1,024 flattened pixels. Scores are softmax model scores, not calibrated probabilities.')
     # Loopback only; choose a different local port with AKSHARCOACH_PORT if needed.
