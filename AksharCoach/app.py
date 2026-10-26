@@ -1,4 +1,5 @@
-"""Local Gradio demo. Run `python app.py` after training and evaluation."""
+#!/usr/bin/env python3
+"""Local Gradio demo. Run `python3 app.py` or `./app.py` after training and evaluation."""
 import json
 import os
 from pathlib import Path
