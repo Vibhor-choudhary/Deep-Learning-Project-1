@@ -64,21 +64,35 @@ def segment_characters(image):
     if arr.mean() < 127: arr=255-arr
     ink=arr < 200
     labels,count=ndimage.label(ink, structure=np.ones((3,3),dtype=int))
-    boxes=[]; total=arr.size
+    candidates=[]; total=arr.size
     for label in range(1,count+1):
         ys,xs=np.where(labels==label)
         if not len(xs): continue
         x0,y0,x1,y1=xs.min(),ys.min(),xs.max()+1,ys.max()+1
         area=len(xs); width,height=x1-x0,y1-y0
-        # Reject dots/noise and long divider lines; retain normal character bodies.
+        # Reject tiny dots/noise and extreme divider lines
         if area < 18 or width < 4 or height < 4 or area > total*.22: continue
         if width > height*8 or height > width*8: continue
-        pad=5; boxes.append((max(0,x0-pad),max(0,y0-pad),min(image.width,x1+pad),min(image.height,y1+pad)))
+        candidates.append({'box': (x0, y0, x1, y1), 'area': area, 'w': width, 'h': height})
+    
+    if not candidates: return []
+    # Filter out dashed grid lines and small border noise relative to main character bodies
+    max_area = max(c['area'] for c in candidates)
+    max_h = max(c['h'] for c in candidates)
+    max_w = max(c['w'] for c in candidates)
+    
+    pad = 5; boxes = []
+    for c in candidates:
+        if max_area > 300 and (c['area'] < max_area * 0.05 or c['h'] < max_h * 0.22 or c['w'] < max_w * 0.15):
+            continue
+        x0,y0,x1,y1 = c['box']
+        boxes.append((max(0,x0-pad),max(0,y0-pad),min(image.width,x1+pad),min(image.height,y1+pad)))
+
     # Reading order: cluster nearby y coordinates into visual rows.
     boxes.sort(key=lambda b:(b[1],b[0])); rows=[]
     for box in boxes:
         centre=(box[1]+box[3])//2
-        row=next((r for r in rows if abs(r[0]-centre)<20),None)
+        row=next((r for r in rows if abs(r[0]-centre)<(max_h*0.3 if 'max_h' in locals() and max_h > 30 else 25)),None)
         if row is None: rows.append([centre,[box]])
         else: row[1].append(box)
     return [box for _,row in rows for box in sorted(row,key=lambda b:b[0])]

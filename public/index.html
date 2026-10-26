@@ -1317,7 +1317,7 @@
 
         // Connected Component Labeling via BFS (8-neighborhood)
         const visited = new Uint8Array(w * h);
-        const boxes = [];
+        const candidates = [];
         const totalPixels = w * h;
 
         for (let y = 0; y < h; y++) {
@@ -1360,15 +1360,17 @@
 
               const bw = maxBx - minBx + 1;
               const bh = maxBy - minBy + 1;
-              // Reject noise (<18px) or massive lines / page borders
+              // Reject tiny noise (<18px) or extreme page borders
               if (area >= 18 && bw >= 4 && bh >= 4 && area <= totalPixels * 0.22) {
                 if (bw <= bh * 8 && bh <= bw * 8) {
-                  const pad = 5;
-                  boxes.push({
-                    x0: Math.max(0, minBx - pad),
-                    y0: Math.max(0, minBy - pad),
-                    x1: Math.min(w, maxBx + pad),
-                    y1: Math.min(h, maxBy + pad)
+                  candidates.push({
+                    x0: minBx,
+                    y0: minBy,
+                    x1: maxBx,
+                    y1: maxBy,
+                    area: area,
+                    bw: bw,
+                    bh: bh
                   });
                 }
               }
@@ -1376,17 +1378,42 @@
           }
         }
 
-        if (boxes.length === 0) {
+        if (candidates.length === 0) {
           document.getElementById('batchResultStatus').value = 'No separate handwritten-character regions were found. Use a plain, light-background image with characters spaced apart.';
+          return;
+        }
+
+        // Filter out small dashed grid lines and speckle noise relative to prominent characters
+        const maxArea = Math.max(...candidates.map(c => c.area));
+        const maxBh = Math.max(...candidates.map(c => c.bh));
+        const maxBw = Math.max(...candidates.map(c => c.bw));
+
+        const boxes = [];
+        const pad = 5;
+        for (const c of candidates) {
+          if (maxArea > 300 && (c.area < maxArea * 0.05 || c.bh < maxBh * 0.22 || c.bw < maxBw * 0.15)) {
+            continue; // Skip grid line dashes, dots, and border tick marks
+          }
+          boxes.push({
+            x0: Math.max(0, c.x0 - pad),
+            y0: Math.max(0, c.y0 - pad),
+            x1: Math.min(w, c.x1 + pad),
+            y1: Math.min(h, c.y1 + pad)
+          });
+        }
+
+        if (boxes.length === 0) {
+          document.getElementById('batchResultStatus').value = 'No valid character regions found after filtering noise.';
           return;
         }
 
         // Reading order: Cluster by row
         boxes.sort((a, b) => (a.y0 - b.y0));
         const rows = [];
+        const rowThreshold = (maxBh > 30) ? maxBh * 0.35 : 25;
         for (const box of boxes) {
           const centre = Math.floor((box.y0 + box.y1) / 2);
-          let matched = rows.find(r => Math.abs(r.centre - centre) < 20);
+          let matched = rows.find(r => Math.abs(r.centre - centre) < rowThreshold);
           if (!matched) {
             matched = { centre, boxes: [] };
             rows.push(matched);
