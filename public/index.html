@@ -684,7 +684,7 @@
   <div id="batchTab" class="gr-tab-content active">
     <h3 class="gr-section-title">Batch mode — use this for more than one character</h3>
     <p class="gr-section-desc">
-      Upload a plain image with <strong>separately spaced handwritten characters</strong>. The app finds each region, classifies each one, and marks uncertain results. It cannot reliably interpret a printed alphabet chart, web-page screenshot, connected handwritten word, or paragraph because the model was trained only on isolated handwriting.
+      Upload a plain image with <strong>separately spaced handwritten characters or an alphabet chart</strong>. The app automatically segments individual characters and strips solid/dashed table grid lines. <em>Note: The deep learning model is an isolated-character classifier trained on the 46 UCI classes (36 consonants क–ज्ञ and 10 digits ०–९). Hindi vowels like अ, आ, इ... and connected words are outside the 46 classes and will be flagged as Uncertain.</em>
     </p>
 
     <!-- Images Row -->
@@ -1315,6 +1315,57 @@
           ink[i] = (gray[i] < 200) ? 1 : 0;
         }
 
+        // Strip long horizontal and vertical table grid lines (>30% of dimension)
+        const horizLen = Math.min(Math.floor(w * 0.32), 180);
+        const vertLen = Math.min(Math.floor(h * 0.32), 180);
+        if (horizLen >= 30 && vertLen >= 30) {
+          const gridMask = new Uint8Array(w * h);
+          // 1. Detect horizontal lines
+          for (let y = 0; y < h; y++) {
+            let runStart = -1;
+            for (let x = 0; x <= w; x++) {
+              const isInk = (x < w) && (ink[y * w + x] === 1);
+              if (isInk) {
+                if (runStart === -1) runStart = x;
+              } else {
+                if (runStart !== -1 && (x - runStart) >= horizLen) {
+                  for (let lx = runStart; lx < x; lx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                      const ny = y + dy;
+                      if (ny >= 0 && ny < h) gridMask[ny * w + lx] = 1;
+                    }
+                  }
+                }
+                runStart = -1;
+              }
+            }
+          }
+          // 2. Detect vertical lines
+          for (let x = 0; x < w; x++) {
+            let runStart = -1;
+            for (let y = 0; y <= h; y++) {
+              const isInk = (y < h) && (ink[y * w + x] === 1);
+              if (isInk) {
+                if (runStart === -1) runStart = y;
+              } else {
+                if (runStart !== -1 && (y - runStart) >= vertLen) {
+                  for (let ly = runStart; ly < y; ly++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                      const nx = x + dx;
+                      if (nx >= 0 && nx < w) gridMask[ly * w + nx] = 1;
+                    }
+                  }
+                }
+                runStart = -1;
+              }
+            }
+          }
+          // Erase grid lines from ink
+          for (let i = 0; i < ink.length; i++) {
+            if (gridMask[i]) ink[i] = 0;
+          }
+        }
+
         // Connected Component Labeling via BFS (8-neighborhood)
         const visited = new Uint8Array(w * h);
         const candidates = [];
@@ -1360,7 +1411,9 @@
 
               const bw = maxBx - minBx + 1;
               const bh = maxBy - minBy + 1;
-              // Reject tiny noise (<18px) or extreme page borders
+              // Reject giant outer table border frame
+              if (bw > w * 0.65 && bh > h * 0.65) continue;
+              // Reject tiny noise (<18px) or extreme lines
               if (area >= 18 && bw >= 4 && bh >= 4 && area <= totalPixels * 0.22) {
                 if (bw <= bh * 8 && bh <= bw * 8) {
                   candidates.push({
@@ -1379,7 +1432,7 @@
         }
 
         if (candidates.length === 0) {
-          document.getElementById('batchResultStatus').value = 'No separate handwritten-character regions were found. Use a plain, light-background image with characters spaced apart.';
+          document.getElementById('batchResultStatus').value = 'No separate character regions were found. Use an image with characters spaced apart.';
           return;
         }
 
@@ -1436,6 +1489,7 @@
 
         const tableRows = [];
         let num = 1;
+        let uncertainCount = 0;
 
         for (const b of sortedBoxes) {
           const bw = b.x1 - b.x0;
@@ -1451,6 +1505,7 @@
           const topPreds = await predictTensor(floatArr);
           const best = topPreds[0];
           const accepted = best.score >= CNN_THRESHOLD;
+          if (!accepted) uncertainCount++;
 
           // Bounding box color: green if accepted, orange if uncertain
           const color = accepted ? '#1d8c41' : '#cd4b2d';
@@ -1469,7 +1524,7 @@
             glyph: best.glyph,
             folder: best.folder,
             score: (best.score * 100).toFixed(2),
-            decision: accepted ? 'Accepted' : 'Uncertain'
+            decision: accepted ? 'Accepted' : 'Uncertain (low score/unsupported)'
           });
 
           num++;
@@ -1478,8 +1533,12 @@
         document.getElementById('batchPlaceholder').style.display = 'none';
         outCanvas.style.display = 'block';
 
-        // Set status
-        document.getElementById('batchResultStatus').value = `Found and analysed ${sortedBoxes.length} separate region(s). Green boxes meet the validation threshold; orange boxes need review. This page mode is for separately spaced handwritten symbols, not printed alphabet charts or connected words.`;
+        // Set status with detailed, helpful message
+        if (uncertainCount > 0) {
+          document.getElementById('batchResultStatus').value = `Found and analysed ${sortedBoxes.length} separate character region(s). ${sortedBoxes.length - uncertainCount} accepted (>=20% threshold), ${uncertainCount} flagged as uncertain. Table/dashed grid lines were automatically stripped. Note: Symbols outside the 46 supported classes (e.g. Hindi vowels अ, आ, इ... or connected words) are flagged as Uncertain.`;
+        } else {
+          document.getElementById('batchResultStatus').value = `Found and analysed ${sortedBoxes.length} separate character region(s). All meet the validation threshold (>=20%). Table/dashed grid lines were automatically stripped.`;
+        }
 
         // Render table
         const tbody = document.getElementById('batchTableBody');

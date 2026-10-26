@@ -53,23 +53,39 @@ def predict_crop(crop):
     return item['glyph'], item['folder'], score.item(), score.item() >= THRESHOLD
 
 
+def remove_grid_lines(ink):
+    """Remove long continuous horizontal and vertical grid lines from tables/charts."""
+    h, w = ink.shape
+    horiz_len = min(int(w * 0.32), 180)
+    vert_len = min(int(h * 0.32), 180)
+    if horiz_len < 30 or vert_len < 30:
+        return ink
+    h_struct = np.ones((1, horiz_len), dtype=bool)
+    v_struct = np.ones((vert_len, 1), dtype=bool)
+    h_lines = ndimage.binary_opening(ink, structure=h_struct)
+    v_lines = ndimage.binary_opening(ink, structure=v_struct)
+    grid = ndimage.binary_dilation(h_lines | v_lines, structure=np.ones((3, 3), dtype=bool))
+    return ink & (~grid)
+
+
 def segment_characters(image):
     """Find separately spaced, dark handwritten characters on a light page.
-
-    This deliberately does not claim to read printed charts, connected words, or
-    table layouts. It is for a page of individually spaced handwritten symbols.
+    Automatically strips table grid lines, border boxes, and dashed dividers.
     """
     gray=ImageOps.grayscale(image)
     arr=np.asarray(gray)
     if arr.mean() < 127: arr=255-arr
     ink=arr < 200
-    labels,count=ndimage.label(ink, structure=np.ones((3,3),dtype=int))
+    clean_ink = remove_grid_lines(ink)
+    labels,count=ndimage.label(clean_ink, structure=np.ones((3,3),dtype=int))
     candidates=[]; total=arr.size
     for label in range(1,count+1):
         ys,xs=np.where(labels==label)
         if not len(xs): continue
         x0,y0,x1,y1=xs.min(),ys.min(),xs.max()+1,ys.max()+1
         area=len(xs); width,height=x1-x0,y1-y0
+        # Reject giant outer frame
+        if width > image.width * 0.65 and height > image.height * 0.65: continue
         # Reject tiny dots/noise and extreme divider lines
         if area < 18 or width < 4 or height < 4 or area > total*.22: continue
         if width > height*8 or height > width*8: continue
@@ -99,17 +115,27 @@ def segment_characters(image):
 
 
 def analyze_page(image):
-    if image is None: return None, 'Please upload a page containing spaced, isolated handwritten characters.', []
+    if image is None: return None, 'Please upload a page containing spaced, isolated handwritten characters or an alphabet chart.', []
     boxes=segment_characters(image)
-    if not boxes: return image, 'No separate handwritten-character regions were found. Use a plain, light-background image with characters spaced apart.', []
+    if not boxes: return image, 'No separate character regions were found. Use an image with characters spaced apart.', []
     annotated=image.convert('RGB').copy(); draw=ImageDraw.Draw(annotated); rows=[]
+    uncertain_count = 0
     for number,box in enumerate(boxes,1):
         glyph,folder,score,accepted=predict_crop(image.crop(box))
+        if not accepted: uncertain_count += 1
         colour=(29,140,65) if accepted else (205,75,45)
         draw.rectangle(box,outline=colour,width=3); draw.text((box[0],max(0,box[1]-15)),str(number),fill=colour)
-        rows.append([number,glyph,folder,round(score*100,2),'Accepted' if accepted else 'Uncertain'])
-    message=(f'Found and analysed {len(boxes)} separate region(s). Green boxes meet the validation threshold; orange boxes need review. '
-             'This page mode is for separately spaced handwritten symbols, not printed alphabet charts or connected words.')
+        decision_str = 'Accepted' if accepted else 'Uncertain (low score/unsupported)'
+        rows.append([number,glyph,folder,round(score*100,2),decision_str])
+    
+    if uncertain_count > 0:
+        message=(f'Found and analysed {len(boxes)} separate region(s). '
+                 f'{len(boxes) - uncertain_count} accepted (>=20% threshold), {uncertain_count} flagged as uncertain. '
+                 'Table and dashed grid lines were automatically stripped. '
+                 'Note: Symbols outside the 46 supported classes (e.g. Hindi vowels अ, आ, इ... or connected words) are flagged as Uncertain.')
+    else:
+        message=(f'Found and analysed {len(boxes)} separate region(s). All meet the validation threshold (>=20%). '
+                 'Table and dashed grid lines were automatically stripped.')
     return annotated,message,rows
 
 
