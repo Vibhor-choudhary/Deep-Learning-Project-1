@@ -189,24 +189,26 @@ def main():
             gr.Markdown("""### About AksharCoach
 **CSM422 Deep Learning Course Project**
 
-#### 1. Core Research Question
-*Does a compact CNN maintain higher robustness and spatial generalization than a flattened-image MLP baseline under limited training data (100 samples/class) and controlled image distortions?*
+#### 1. What is this project?
+AksharCoach is an AI model that recognizes single handwritten Hindi (Devanagari) characters and digits. You draw or upload a character, and the model predicts what letter it is with a confidence score.
 
-#### 2. Dataset & Benchmark
-* **Dataset:** UCI Devanagari Handwritten Character Dataset (CC BY 4.0, Patel et al.).
-* **Classes:** 46 total (36 consonants क–ज्ञ and 10 digits ०–९).
-* **Evaluation Partition:** 15% official held-out test split (13,800 images).
+#### 2. Why did we build it?
+To compare a modern **Convolutional Neural Network (CNN)** against a basic neural network (MLP) and prove that CNNs are far better at handling messy, rotated, or blurry handwriting when training data is limited.
 
-#### 3. Model Architecture Comparison
-* **Compact CNN (Proposed - 91.80% Test Acc):** `[1, 32, 32] -> Conv2D(32, 3x3) -> MaxPool(2x2) [32, 16, 16] -> Conv2D(64, 3x3) -> MaxPool(2x2) [64, 8, 8] -> Flatten(4096) -> Linear(128) + ReLU + Dropout -> Linear(46 logits)`. Preserves 2D stroke geometry and spatial translation invariance.
-* **MLP Baseline (75.14% Test Acc):** `[1, 32, 32] -> Flatten(1024) -> Linear(128) + ReLU + Dropout -> Linear(46 logits)`. Destroys 2D pixel adjacency by treating each pixel as an independent feature.
+#### 3. How does it work? (4 Steps)
+1. **Input:** You draw or upload a single handwritten letter.
+2. **Preprocess:** The image is centered, inverted (white stroke on dark background), and resized to 32×32 pixels.
+3. **Recognition:** The CNN scans the 2D stroke curves and loops.
+4. **Decision:** The model outputs the top prediction. If confidence is below 20%, it marks it as *Uncertain*.
 
-#### 4. Scope & Responsible Boundary
-* **Supported Scope:** Single isolated Devanagari consonants (क–ज्ञ) and digits (०–९) on plain background or separated sheets.
-* **Limitations:** Not full-word or sentence OCR; does not segment connected Shirorekha or Hindi vowels (स्वर), which were outside the UCI benchmark scope.
-* **Softmax Scores:** Scores are model outputs, not calibrated real-world probabilities. Low-confidence predictions (<20%) are safely rejected as *Uncertain*.
+#### 4. The Key Result (Viva Summary)
+* **CNN Accuracy: 91.80%** (Wins because it understands 2D stroke shapes and curves).
+* **Basic Model Accuracy: 75.14%** (Loses because it flattens the image into random disconnected dots).
 
-**Documentation:** [GitHub Repository](https://github.com/Vibhor-choudhary/Deep-Learning-Project-1) | [Technical Report](https://github.com/Vibhor-choudhary/Deep-Learning-Project-1/blob/main/AksharCoach/REPORT.md) | [Viva Defense Guide](https://github.com/Vibhor-choudhary/Deep-Learning-Project-1/blob/main/AksharCoach/VIVA_QUESTIONS.md)
+#### 5. Scope & Limitations
+* **Supported:** 46 single characters (36 consonants **क to ज्ञ** and 10 numbers **० to ९**).
+* **Not Supported:** Full sentences, words with a connecting top line (shirorekha), or vowels (स्वर: अ, आ, इ...).
+* **Safety:** Unclear or unsupported symbols are safely flagged as *Uncertain* rather than making blind guesses.
 """)
     # Loopback only; choose a different local port with AKSHARCOACH_PORT if needed.
     app.launch(server_name='127.0.0.1', server_port=int(os.getenv('AKSHARCOACH_PORT', '7860')), share=False)

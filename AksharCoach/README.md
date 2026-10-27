@@ -1,32 +1,46 @@
-# AksharCoach
+# AksharCoach — Local Application
 
-An offline-first course project for isolated handwritten Devanagari characters/digits. It compares an MLP baseline to a compact CNN with limited training data, measures clean and distorted held-out test performance, and uses a validation-selected uncertainty threshold. It is **not full Hindi word or paragraph OCR**.
+Offline AI recognizer for isolated handwritten Hindi (Devanagari) characters and digits.
 
-## Quick start (macOS/Linux)
+---
+
+## 1. Quick Start
+
+Run the application locally:
 
 ```bash
-cd /Users/vibhor/Documents/ChatGPT/DLP/AksharCoach
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python train.py --per-class 100 --epochs 20
-python evaluate.py
-python -m pytest -q
-python app.py
+cd AksharCoach
+python3 app.py
 ```
+*(Or directly: `./app.py`)*
 
-If port 7860 is occupied on your computer, use another local port: `AKSHARCOACH_PORT=8089 python app.py`.
+Then open `http://127.0.0.1:7860` in your web browser.
 
-The official UCI data was placed under `data/DevanagariHandwrittenCharacterDataset/` for this run. If absent, download and extract the URL in `data/README.md`; do not replace the official Test folder with augmented images.
+---
 
-## What the experiment does
+## 2. What it is & How it Works
 
-Training samples are balanced per folder with seed 42. Fifteen percent of that subset is validation; the official Test folder is evaluated only after checkpoint selection. Training augmentation is small rotation/translation. The robustness test applies a controlled family of small affine motion, blur, and Gaussian pixel noise to held-out copies. Results and figures are generated in `outputs/`; they are never hand-written into the documentation.
+* **Single Character Mode:** Draw on the canvas or upload a character. The app resizes it to 32×32 and classifies it among 46 Devanagari classes.
+* **Batch Mode:** Upload an image containing multiple spaced characters or an alphabet chart. The system automatically strips table/grid lines, detects each character box, and runs recognition across all symbols.
+* **Safety Mechanism:** If a prediction has low confidence (<20%), it is flagged as **Uncertain** instead of guessing.
 
-## Two useful modes
+---
 
-- **Recognize:** one tightly cropped handwritten character.
-- **Analyse a page of separate characters:** detects each separately spaced handwritten character on a plain, light background, then classifies every detected crop. Try the bundled 12-character demo first. It is intentionally not presented as printed-chart, word, or paragraph OCR.
+## 3. Results Summary
 
-`app.py` binds Gradio only to `127.0.0.1`, has no sharing link, and requires trained checkpoints plus evaluation outputs.
+* **Compact CNN (Proposed):** **91.80% Accuracy** on official test data (13,800 images).
+* **Basic MLP (Baseline):** **75.14% Accuracy**.
+* **Distorted Test (Rotations/Blur):** CNN remains robust at **87.07%**, while MLP collapses to **66.94%**.
+
+---
+
+## 4. Scope for Viva
+
+* **Supported:** 46 classes (36 consonants **क to ज्ञ**, 10 digits **० to ९**).
+* **Not Supported:** Full words, connected text with shirorekha, or vowels (अ, आ, इ...).
+* **Files:**
+  * `app.py`: Local Gradio web UI.
+  * `evaluate.py`: Generates test metrics and confusion matrix.
+  * `train.py`: Model training pipeline.
+  * `REPORT.md`: Full technical academic report.
+  * `VIVA_QUESTIONS.md`: 38 common viva questions & answers.
